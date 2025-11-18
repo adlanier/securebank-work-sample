@@ -69,7 +69,7 @@ await db.insert(users).values({
 Because ssn was part of input, the raw 9-digit SSN was written directly to the database with no hashing, encryption, or obfuscation. Additionally, the API responses returned the complete user record (minus password), which meant the plaintext SSN could also be exposed in API responses.
 
 ##### Fix Implemented
-Prevent raw SSN from ever being written to the database.
+1\. Prevent raw SSN from ever being written to the database.
 
 I destructured the input to isolate the SSN so it would not get included via the spread:
 ```
@@ -87,7 +87,7 @@ await db.insert(users).values({
   ssn: hashedSSN,
 });
 ```
-2. Prevent SSN from being exposed in API responses
+2\. Prevent SSN from being exposed in API responses
 
 Both the signup and login responses were updated to strip out password and ssn before returning the user:
 ```
@@ -246,7 +246,7 @@ Manual Verification (UI + DB)
 - Clicked “Sign Out” in the UI and verified that the session cookie was cleared and that npm run db:list-sessions showed no remaining session rows for that user. Since the old JWT no longer has a corresponding session row in the database, it is treated as invalid on subsequent requests.
 
 ##### Preventive Measures
-- Enforce “one session per user” or “max N sessions” depending on policyAdd automated tests for session cleanup logic (optional)
+- Enforce “one session per user” or “max N sessions” depending on policyAdd automated tests for session cleanup logic
 - Rotate session tokens on privileged operations
 - Periodically purge expired sessions via background job
 
@@ -257,8 +257,6 @@ Manual Verification (UI + DB)
 The application was accepting invalid email formats and failing to catch common user mistakes. Emails were also being normalized to lowercase without proper validation beforehand, which led to confusing behavior and inconsistent data quality, affecting both the signup and login flows.
 
 ##### Root Cause
-There were two underlying problems:
-
 1\. Extremely Weak Frontend Validation. 
 
 The original React Hook Form pattern was:
@@ -425,7 +423,7 @@ This immediately blocks invalid DOBs before switching steps.
 
 2\. Backend Fix (Zod Validation in tRPC Schema)
 
-We added a dedicated dateOfBirthSchema that mirrors the frontend checks and also protects the API from direct misuse or bypassing the UI.
+I added a dedicated dateOfBirthSchema that mirrors the frontend checks and also protects the API from direct misuse or bypassing the UI.
 
 New Zod schema:
 ```
@@ -460,9 +458,9 @@ Manual Testing
 - A DOB that is exactly 18 years old on today’s date is accepted, confirming correct boundary handling.
 - Empty DOB fields display “Date of birth is required” and block progression.
 
-Backend Validation (Jest Tests)
+Backend Validation
 
-- I added automated tests around the shared dateOfBirthSchema using a fixed “today” date to avoid timezone-related drift. The suite confirms that the backend:
+I added `dateOfBirthSchema.test.ts` that uses a fixed “today” date to avoid timezone-related drift. The suite confirms that the backend:
 - Accepts a clearly adult DOB (over 18).
 - Accepts a DOB that is exactly 18 on the fixed reference date.
 - Rejects a DOB where the user turns 18 tomorrow (off-by-one prevention).
@@ -529,8 +527,6 @@ In combination, this meant:
 - International or malformed numbers were stored without any constraints
 
 ##### Fix Implemented
-I tightened validation on both the frontend and backend to require a proper US NANP phone number and to keep the rules consistent.
-
 1\. Frontend (Signup Step 2)
 
 Normalize the user’s input by stripping out non-digit characters (spaces, dashes, parentheses, etc.)
@@ -602,16 +598,13 @@ await fundAccountMutation.mutateAsync({
   ...
 });
 ```
-and did not enforce > 0, so any syntactically valid numeric string, including zero, was sent to the fundAccount mutation.
+and did not enforce `> 0`, so any syntactically valid numeric string, including zero, was sent to the fundAccount mutation.
 
 On the backend, the fundAccount input schema already enforces the amount as z.number().positive(). So the server correctly rejected zero and negative amounts, but from the user’s perspective this appeared as a generic “failed to fund account” error coming back from the mutation, not as a targeted validation message on the amount field.
 
 In other words, the Backend already enforced positivity, but the Frontend let bad amounts through, causing validation to fail late and with poor UX.
 
 ##### Fix Implemented
-
-I tightened validation inside FundingModal and added a defensive guard in the submit handler.
-
 1\. Enforce “amount > 0” at the form validation level
 
 The amount field is now registered with a custom validation function that checks the parsed numeric value:
@@ -640,7 +633,11 @@ This change ensures that:
 - The user sees a clear, inline error, “Amount must be greater than $0.00”, directly under the field.
 - The submit button remains disabled by form validation until the user fixes the amount.
 
-As part of this, the pattern check remains in place. Users can still type non-numeric characters into the field, but on submit the form shows “Invalid amount format” and refuses to proceed. This matches the manual QA notes: letters can be typed, but they cannot be submitted.
+As part of this, the pattern check remains in place. Users can still type non-numeric characters into the field, but on submit the form shows “Invalid amount format” and refuses to proceed. 
+
+This matches the manual QA notes:
+- Letters can be typed
+- Letters can not be submitted
 
 2\. Add a defensive guard in onSubmit before calling the mutation
 
@@ -753,7 +750,7 @@ The validation in `FundingModal.tsx` was updated to use a correct card-number ve
 - Only applies these checks when the funding source type is "card".
 - Invalid card numbers now fail at the UI level with a clear and accurate message.
 
-1\. Backend
+2\. Backend
 
 - A matching validation step was added to the Zod schema for the fundAccount mutation. A superRefine block now checks that:
 - The number contains exactly sixteen digits.
@@ -861,7 +858,7 @@ if (!/^\d{9}$/.test(routingDigits)) {
   });
 }
 ```
-3. Kept routingNumber optional at the type level
+3\. Kept routingNumber optional at the type level
 
 This is necessary because:
 - For type: "card", routing numbers are irrelevant.
@@ -931,8 +928,6 @@ The backend signup mutation only enforced a minimal Zod rule:
 allowing any 8-character string and did not require uppercase, lowercase, digits, special characters, or denylisted patterns.
 
 Although the frontend had basic validation (min length, digit, and a tiny denylist), this logic was not present on the server. Users could bypass the UI or use a non-browser client and still register with weak passwords.
-
-There was no consistency between client and server validation, and the backend provided no real password security.
 
 ##### Fix Implemented
 
@@ -1033,7 +1028,7 @@ On the backend, the fundAccount mutation already enforced:
 so only positive numeric values were accepted. The bug was therefore limited to the frontend formatting/validation of the amount input.
 
 ##### Fix Implemented
-I tightened the frontend validation logic in `FundingModal` so only properly formatted currency values are allowed and zero amounts are explicitly rejected:
+I added this frontend validation logic in `FundingModal` so only properly formatted currency values are allowed and zero amounts are explicitly rejected:
 ```
 <input
   id="amount"
@@ -1552,7 +1547,7 @@ Transactions are now always returned with the newest first:
 
 This ensures the UI always receives a stable, predictable list.
 
-2. Removed the N+1 Query Loop
+2\. Removed the N+1 Query Loop
 
 Instead of re-querying the database for each transaction, enrichment now uses the already-loaded account object:
 ```
@@ -1564,7 +1559,7 @@ const enriched = accountTransactions.map(t => ({
 
 This reduces N+1 DB calls to zero.
 
-3. Updated fundAccount to Retrieve the Most Recent Transaction Correctly
+3\. Updated fundAccount to Retrieve the Most Recent Transaction Correctly
 
 Fetching the new transaction now uses:
 ```
@@ -1575,7 +1570,7 @@ Ensuring the mutation returns the transaction that was just inserted.
 
 ##### Verification
 Manual Verification
-- Fund the same account multiple times (e.g., $5, $10, $15).
+- Fund the same account multiple times.
 
 - Open the account and confirm:
     - The latest transaction is always at the top.
@@ -1594,8 +1589,6 @@ Manual Verification
 ##### Issue Summary
 Users reported that after multiple funding events, not all transactions appeared in the transaction history for an account. This created confusion and made it seem like some deposits were “missing” even though the balance had changed.
 ##### Root Cause
-There were two related issues in the accountRouter implementation:
-
 1\. fundAccount returned the wrong transaction.
 
 After inserting a new transaction, the code fetched the “created” transaction with:
@@ -1639,9 +1632,9 @@ const transaction = await db
   .get();
 ```
 
-- Filters by the current accountId so we only consider transactions for that account.
+- Filters by the current accountId to only consider transactions for that account.
 
-- Sorts by createdAt in descending order so the most recent transaction (the one we just inserted) is returned.
+- Sorts by createdAt in descending order so the most recent transaction (the one that was just inserted) is returned.
 
 Make transaction history deterministic in getTransactions:
 
@@ -1816,9 +1809,9 @@ The query pattern is now O(1) instead of O(N).
 
 ##### Verification
 Verification was performed through functional testing in the running application to ensure:
-the refactor did not break transaction history
-the returned data is still correct
-behavior is consistent across accounts and users
+- The refactor did not break transaction history
+- The returned data is still correct
+- Behavior is consistent across accounts and users
 
 1. Verified baseline behavior
 - Logged in as a test user and created a checking account and funded it multiple times. Opening the transaction history page confirmed:
