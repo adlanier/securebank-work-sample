@@ -339,7 +339,7 @@ Manual Testing:
     - user@example.con (common typo)
 - Login succeeds regardless of the email casing used.
 
-Automated Testing (Jest):
+Automated Testing
 
 A dedicated test suite `auth.emails.test.ts` verifies:
 - Email normalization to lowercase
@@ -713,7 +713,7 @@ Manual Verification
 
 Backend enforcement remains intact `z.number().positive()` for any non-UI requests.
 
-Automated Tests (Jest)
+Automated Tests
 
 Added `FundingModal.amount.test.tsx` confirming:
 - Zero/invalid amounts show inline errors and do not call the mutation.
@@ -982,9 +982,9 @@ This prevents users from progressing past Step 1 with a weak password and keeps 
 ##### Verification
 After implementing the updated password requirements, I verified the fix across all entry points:
 
-Backend Unit Tests (Jest):
+Automated Tests
 
-I added a dedicated test suite (auth.passwords.test.ts) confirming that the new passwordSchema behaves correctly.
+I added `auth.passwords.test.ts` confirming that the new passwordSchema behaves correctly.
 - Strong passwords (including minimum-length edge cases) are accepted.
 - Passwords missing required character classes (uppercase, lowercase, number, special) are rejected with the correct specific messages.
 - Weak or predictable passwords are rejected.
@@ -1986,7 +1986,7 @@ No areas were found where text became invisible or unreadably low-contrast in da
 
 I verified the most critical fixes using a combination of automated Jest tests, targeted schema tests, component tests, and manual end-to-end QA.
 
-### Automated Tests (Jest)
+### Automated Tests
 
 **Validation & Auth**
 - `auth.emails.test.ts`: email normalization, malformed address rejection, '.con' typo detection.
