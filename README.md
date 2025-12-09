@@ -4,7 +4,7 @@ This repository contains a small banking-style web application maintained as an 
 
 ## 📋 Challenge Instructions
 
-he original project prompt and requirements can be found in [CHALLENGE.md](./CHALLENGE.md) for complete instructions and requirements. The application has since been treated as a standalone systems project and maintained as a reusable work sample.
+The original project prompt and requirements can be found in [CHALLENGE.md](./CHALLENGE.md) for complete instructions and requirements. The application has since been treated as a standalone systems project and maintained as a reusable work sample.
 
 ## 🚀 Quick Start
 
