@@ -1,13 +1,18 @@
-# Technical Interview Challenge
+# SecureBank – Original Project Prompt (Archived for Context)
+
+This document contains the original prompt used to generate this SecureBank debugging and reliability project. The application has since been maintained as a standalone engineering work sample. The scope, constraints, and reported issues below reflect realistic production-style defects that were intentionally included for investigation and resolution.
 
 ## Overview
 
-You have been provided with a NextJS TypeScript banking application that has several reported customer issues. Your goal is to **investigate, document root causes, and resolve as many bugs as possible within 48 hours**. Extra credit will be given for adding tests that verify your fixes.
+You have been provided with a NextJS TypeScript banking application that has several reported customer issues. Your goal is to **investigate, document root causes, and resolve as many bugs as possible within 48 hours**. Additional validation and test coverage further strengthen the solution.
 
-## Deliverable
+## Deliverables (Original Scope)
 
-1. Submit your code as a link to a **new, public GitHub Repository under your profile**, or **attach a .zip file of your code**. In either case, submit via an e-mail.
-2. Include your written documentation (described below) in the same e-mail.
+1. Code implementation in a public GitHub repository  
+2. Written documentation describing:
+   - Root cause of each issue  
+   - How each fix resolves the problem  
+   - Preventive measures to avoid regressions  
 
 ## The Application
 
@@ -19,17 +24,17 @@ You have been provided with a NextJS TypeScript banking application that has sev
 - Fund accounts (via card or bank transfer)
 - View transaction history
 
-## Your Mission
+## Investigation Objectives
 
-1. **Clone the repository and install dependencies**
+1. **Install dependencies** and run the application
 2. **Investigate reported issues** and document root causes
 3. **Fix the identified bugs** with proper solutions
-4. **Write clear documentation for each bug, and submit this via e-mail,** explaining:
+4. **Write clear documentation for each bug** explaining:
    - What caused each bug
    - How the fix resolves it
    - What preventive measures can avoid similar issues
-5. **[Extra Credit] Add tests** to verify your fixes
-6. **Prioritize issues** based on user impact
+5. **Add tests** to verify your fixes
+6. **Prioritize issues** based on user and security impact
 
 ## Getting Started
 
@@ -251,12 +256,12 @@ Below are customer-reported issues in ticket format. Each requires investigation
 - **Description**: "Database connections remain open"
 - **Impact**: System resource exhaustion
 
-## Evaluation Criteria
+## Evaluation Focus (Original Purpose)
 
-You will be evaluated on:
+This project was designed to evaluate:
 
-1. **Solution Quality**: Effectiveness and robustness of fixes
-2. **Documentation**: Clarity and completeness of explanations
-3. **Prioritization**: Ability to identify and address critical issues first
+1. Solution quality and robustness  
+2. Technical documentation clarity  
+3. Prioritization of critical security and reliability issues  
 
-Good luck! Remember, the goal is to demonstrate your ability to investigate, solve, and clearly explain technical issues.
+The same criteria continue to be used to assess this project as a long-term engineering work sample.
